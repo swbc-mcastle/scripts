@@ -1,0 +1,5 @@
+Remove-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Ellie Mae\Encompass' -Name "WordBackgroundPrint"
+Remove-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Ellie Mae\Encompass' -Name "UseWordSaveAsPDFAddIn"
+Remove-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown' -Name "bProtectedMode"
+Remove-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown' -Name "bEnhancedSecurityInBrowser"
+Remove-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown' -Name "bEnhancedSecurityStandalone"

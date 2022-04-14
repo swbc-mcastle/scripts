@@ -1,0 +1,26 @@
+Invoke-WebRequest -Uri "http://download.elliemae.com/encompass/install/tps/pdfconverter.zip" -OutFile "C:\CMC\pdfconverter.zip"
+Expand-Archive -Path "C:\CMC\pdfconverter.zip" -DestinationPath "C:\CMC\"
+& 'C:\CMC\pdfconverter\install.exe' -u -s
+& 'C:\CMC\pdfconverter\InstallPdfConverter.exe'
+
+$registryPath = "HKLM:\SOFTWARE\Wow6432Node\Ellie Mae\Encompass"
+$Name = "WordBackgroundPrint"
+$value = "0"
+New-ItemProperty -Path $registryPath -Name $name -Value $value -PropertyType String -Force | Out-Null
+
+$registryPath = "HKLM:\SOFTWARE\Wow6432Node\Ellie Mae\Encompass"
+$Name = "UseWordSaveAsPDFAddIn"
+$value = "1"
+New-ItemProperty -Path $registryPath -Name $name -Value $value -PropertyType String -Force | Out-Null
+
+$null = New-PSDrive -Name HKCC -PSProvider Registry -Root Registry::HKEY_CURRENT_CONFIG
+New-Item -Path HKCC:\Software -Name Encompass
+$acl = Get - Acl HKCC:\SOFTWARE\Encompass
+$rule = New - Object System.Security.AccessControl.RegistryAccessRule ("Everyone","FullControl","Allow")
+$acl.SetAccessRule($rule)
+$acl |Set-Acl -Path HKCC:\SOFTWARE\Encompass
+
+New-Item -Path "HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown"
+New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -Name "bProtectedMode" -Value "00000000" -PropertyType DWORD -Force | Out-Null
+New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -Name "bEnhancedSecurityInBrowser" -Value "00000000" -PropertyType DWORD -Force | Out-Null
+New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -Name "bEnhancedSecurityStandalone" -Value "00000000" -PropertyType DWORD -Force | Out-Null
