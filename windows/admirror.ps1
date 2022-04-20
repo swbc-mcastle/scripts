@@ -20,3 +20,4 @@ $CopyFromUser.MemberOf | Where{$CopyToUser.MemberOf -notcontains $_} |  Add-ADGr
 Add-ADGroupMember -identity O365_MFA_Required -Members $CopyToUser
 Move-ADObject -Identity $MoveTarget -TargetPath $MirrorAfterOU
 Set-ADUser $TargetUser -Description "$HireDate`_$Ticket`_$Tech`_$Desc"
+Set-ADAccountPassword -Reset -Identity $TargetUser
