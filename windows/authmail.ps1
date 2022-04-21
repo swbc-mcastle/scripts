@@ -12,10 +12,10 @@ $Outlook = New-Object -ComObject Outlook.Application
 $ns = $Outlook.GetNameSpace("MAPI")
 $Mail = $Outlook.CreateItem(0)
 #$Mail.IsBodyHTML = $True
-$Mail.to = $Recipient 
+$Mail.to = $Recipient
 $Mail.subject = "Request for Approval"
 $Mail.Body = "$Greeting"
-$Message.Body 
+$Message.Body
 $Mail.save()
 $Inspector = $Mail.GetInspector
 $Inspector.Display()
