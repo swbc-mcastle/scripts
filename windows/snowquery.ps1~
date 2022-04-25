@@ -1,2 +1,0 @@
-$ServiceNowInstance = 'https://swbc.service-now.com'
-$IncidentURL = "$ServiceNowInstance/api/now/table/incident"

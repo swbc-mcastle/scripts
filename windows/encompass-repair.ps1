@@ -14,8 +14,7 @@ $sid = $user.Translate([System.Security.Principal.SecurityIdentifier])
 $PSDrives = (get-psdrive).Name
 
 #create a new PSDrive mapping "HKEY_USERS to "HKU:\" if not already created
-if ($PSDrives -notcontains "HKU") 
-   {
+if ($PSDrives -notcontains "HKU") {
     New-PSDrive -PSProvider Registry -Name HKU -Root HKEY_USERS | Out-Null
    }
 
@@ -71,24 +70,19 @@ regsvr32 ntdll.dll /s
 
 #checks below will automatically make needed changes and output to logfile 
 Write-Output "Testing path: HKLM:\SOFTWARE\WOW6432Node\Ellie Mae\Encompass..." | Out-File -FilePath $logfile -Append
-if ($regpathcheck1 -contains "True")
-    {
+if ($regpathcheck1 -contains "True") {
     Write-Output "Path found, no action taken" | Out-File -FilePath $logfile -Append
     }
-else
-    {
+else {
     Write-Output "Path not found, creating: HKLM:\SOFTWARE\WOW6432Node\Ellie Mae\Encompass" | Out-File -FilePath $logfile -Append
     New-Item -Path "HKLM:\SOFTWARE\WOW6432Node\Ellie Mae"
     New-Item -Path "HKLM:\SOFTWARE\WOW6432Node\Ellie Mae\Encompass"
     }
     Write-Output "Testing path: HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown..." | Out-File -FilePath $logfile -Append
-if ($regpathcheck2 -contains "True")
-    {
+if ($regpathcheck2 -contains "True") {
     Write-Output "Path found, no action taken" | Out-File -FilePath $logfile -Append
-    }
-else 
-    {
-    Write-Output "Path not found, creating path: HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" | Out-File -FilePath $logfile -Append
+    } else {
+	Write-Output "Path not found, creating path: HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" | Out-File -FilePath $logfile -Append
     New-Item -Path "HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown"
     }
     Write-Output "Checking RegKey: WordBackgroundPrint..." | Out-File -FilePath $logfile -Append
