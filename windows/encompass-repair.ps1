@@ -7,14 +7,15 @@ import-module Microsoft.PowerShell.Management
 Add-Type -AssemblyName PresentationCore,PresentationFramework
 
 #get SID of currently logged in user
-$user = New-Object System.Security.Principal.NTAccount($env:username) 
-$sid = $user.Translate([System.Security.Principal.SecurityIdentifier]) 
+$user = New-Object System.Security.Principal.NTAccount($env:username)
+$sid = $user.Translate([System.Security.Principal.SecurityIdentifier])
 
 #list current PSDrives
 $PSDrives = (get-psdrive).Name
 
 #create a new PSDrive mapping "HKEY_USERS to "HKU:\" if not already created
-if ($PSDrives -notcontains "HKU") {
+if ($PSDrives -notcontains "HKU") 
+   {
     New-PSDrive -PSProvider Registry -Name HKU -Root HKEY_USERS | Out-Null
    }
 
@@ -70,107 +71,82 @@ regsvr32 ntdll.dll /s
 
 #checks below will automatically make needed changes and output to logfile 
 Write-Output "Testing path: HKLM:\SOFTWARE\WOW6432Node\Ellie Mae\Encompass..." | Out-File -FilePath $logfile -Append
-if ($regpathcheck1 -contains "True") {
-    Write-Output "Path found, no action taken" | Out-File -FilePath $logfile -Append
-    }
-else {
-    Write-Output "Path not found, creating: HKLM:\SOFTWARE\WOW6432Node\Ellie Mae\Encompass" | Out-File -FilePath $logfile -Append
-    New-Item -Path "HKLM:\SOFTWARE\WOW6432Node\Ellie Mae"
-    New-Item -Path "HKLM:\SOFTWARE\WOW6432Node\Ellie Mae\Encompass"
-    }
-    Write-Output "Testing path: HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown..." | Out-File -FilePath $logfile -Append
-if ($regpathcheck2 -contains "True") {
-    Write-Output "Path found, no action taken" | Out-File -FilePath $logfile -Append
+    if ($regpathcheck1 -contains "True") {
+        Write-Output "Path found, no action taken" | Out-File -FilePath $logfile -Append
     } else {
-	Write-Output "Path not found, creating path: HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" | Out-File -FilePath $logfile -Append
-    New-Item -Path "HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown"
+        Write-Output "Path not found, creating: HKLM:\SOFTWARE\WOW6432Node\Ellie Mae\Encompass" | Out-File -FilePath $logfile -Append
+        New-Item -Path "HKLM:\SOFTWARE\WOW6432Node\Ellie Mae"
+        New-Item -Path "HKLM:\SOFTWARE\WOW6432Node\Ellie Mae\Encompass"
+    }   
+Write-Output "Testing path: HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown..." | Out-File -FilePath $logfile -Append
+    if ($regpathcheck2 -contains "True") {
+        Write-Output "Path found, no action taken" | Out-File -FilePath $logfile -Append
+    } else {
+        Write-Output "Path not found, creating path: HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" | Out-File -FilePath $logfile -Append
+        New-Item -Path "HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown"
     }
-    Write-Output "Checking RegKey: WordBackgroundPrint..." | Out-File -FilePath $logfile -Append
-if ($regcheck1 -contains "True" -and $regcheck1_2 -contains "True")
-    {
-    Write-Output "RegKey: WordBackgroundPrint is correctly installed, no action taken" | Out-File -FilePath $logfile -Append
+Write-Output "Checking RegKey: WordBackgroundPrint..." | Out-File -FilePath $logfile -Append
+    if ($regcheck1 -contains "True" -and $regcheck1_2 -contains "True") {
+        Write-Output "RegKey: WordBackgroundPrint is correctly installed, no action taken" | Out-File -FilePath $logfile -Append
+    } else {
+        Write-Output "Key not found, writing RegKey: WordBackgroundPrint" | Out-File -FilePath $logfile -Append
+        New-Itemproperty -Path "HKLM:\SOFTWARE\Wow6432Node\Ellie Mae\Encompass" -Name "WordBackgroundPrint" -Value "0" -PropertyType String -Force | Out-Null
     }
-else 
+Write-Output "Checking RegKey: UseWordSaveAsPDFAddIn..." | Out-File -FilePath $logfile -Append
+    if ($regcheck2 -contains "True" -and $regcheck2_2 -contains "True")
     {
-    Write-Output "Key not found, writing RegKey: WordBackgroundPrint" | Out-File -FilePath $logfile -Append
-    New-Itemproperty -Path "HKLM:\SOFTWARE\Wow6432Node\Ellie Mae\Encompass" -Name "WordBackgroundPrint" -Value "0" -PropertyType String -Force | Out-Null
+        Write-Output "RegKey: UseWordSaveAsPDFAddIn is correctly installed, no action taken" | Out-File -FilePath $logfile -Append
+    } else {
+        Write-Output "Key not found, writing RegKey: UseWordSaveAsPDFAddIn" | Out-File -FilePath $logfile -Append
+        New-Itemproperty -Path "HKLM:\SOFTWARE\Wow6432Node\Ellie Mae\Encompass" -Name "UseWordSaveAsPDFAddIn" -Value "1" -PropertyType String -Force | Out-Null
     }
-    Write-Output "Checking RegKey: UseWordSaveAsPDFAddIn..." | Out-File -FilePath $logfile -Append
-if ($regcheck2 -contains "True" -and $regcheck2_2 -contains "True")
-    {
-    Write-Output "RegKey: UseWordSaveAsPDFAddIn is correctly installed, no action taken" | Out-File -FilePath $logfile -Append
+Write-Output "Checking RegKey: bProtectedMode..." | Out-File -FilePath $logfile -Append
+    if ($regcheck3 -contains "True" -and $regcheck3_2 -contains "True") {
+        Write-Output "RegKey: bProtectedMode is correctly installed, no action taken" | Out-File -FilePath $logfile -Append
+    } else {
+        Write-Output "Key not found, writing RegKey: bProtectedMode" | Out-File -FilePath $logfile -Append
+        New-Itemproperty  -Path "HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -Name "bProtectedMode" -Value "00000000" -PropertyType DWORD -Force | Out-Null
     }
-else 
+Write-Output "Checking Regkey: bEnhancedSecurityInBrowser..." | Out-File -FilePath $logfile -Append
+    if ($regcheck3_3 -contains "True" -and $regcheck3_4 -contains "True") {
+        Write-Output "RegKey: bEnhancedSecurityInBrowser is correctly installed, no action taken" | Out-File -FilePath $logfile -Append
+    } else
     {
-    Write-Output "Key not found, writing RegKey: UseWordSaveAsPDFAddIn" | Out-File -FilePath $logfile -Append
-    New-Itemproperty -Path "HKLM:\SOFTWARE\Wow6432Node\Ellie Mae\Encompass" -Name "UseWordSaveAsPDFAddIn" -Value "1" -PropertyType String -Force | Out-Null
+        Write-Output "Key not found, writing RegKey: bEnhancedSecurityInBrowser" | Out-File -FilePath $logfile -Append
+        New-Itemproperty -Path "HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -Name "bEnhancedSecurityInBrowser" -Value "00000000" -PropertyType DWORD -Force | Out-Null
     }
-    Write-Output "Checking RegKey: bProtectedMode..." | Out-File -FilePath $logfile -Append
-if ($regcheck3 -contains "True" -and $regcheck3_2 -contains "True")
-    {
-    Write-Output "RegKey: bProtectedMode is correctly installed, no action taken" | Out-File -FilePath $logfile -Append
+Write-Output "Checking RegKey: bEnhancedSecurityStandalone..." | Out-File -FilePath $logfile -Append
+    if ($regcheck3_5 -contains "True" -and $regcheck3_6 -contains "True") {
+        Write-Output "RegKey: bEnhancedSecurityStandalone is correctly installed, no action taken" | Out-File -FilePath $logfile -Append
+    } else {
+        Write-Output "Key not found, writing RegKey: bEnhancedSecurityStandalone" | Out-File -FilePath $logfile -Append
+        New-Itemproperty -Path "HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -Name "bEnhancedSecurityStandalone" -Value "00000000" -PropertyType DWORD -Force | Out-Null
     }
-else
-    {
-    Write-Output "Key not found, writing RegKey: bProtectedMode" | Out-File -FilePath $logfile -Append
-    New-Itemproperty  -Path "HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -Name "bProtectedMode" -Value "00000000" -PropertyType DWORD -Force | Out-Null
+    if ($regcheck4 -contains "True") {
+        Write-Output "Bad key found in HKCU\...\AppCompatFlags\Layers, removing key" | Out-File -FilePath $logfile -Append
+        Remove-Itemproperty "HKU:\$sid\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" -Name "C:\SmartClientCache\Apps\Ellie Mae\Encompass\Encompass.exe"
     }
-    Write-Output "Checking Regkey: bEnhancedSecurityInBrowser..." | Out-File -FilePath $logfile -Append
-if ($regcheck3_3 -contains "True" -and $regcheck3_4 -contains "True")
-    {
-    Write-Output "RegKey: bEnhancedSecurityInBrowser is correctly installed, no action taken" | Out-File -FilePath $logfile -Append
+    if ($regcheck4_2 -contains "True") {
+        Write-Output "Bad key found in HKLM\...\AppCompatFlags\Layers, removing key" | Out-File -FilePath $logfile -Append
+        Remove-Itemproperty "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" -Name "C:\SmartClientCache\Apps\Ellie Mae\Encompass\Encompass.exe"
     }
-else
-    {
-    Write-Output "Key not found, writing RegKey: bEnhancedSecurityInBrowser" | Out-File -FilePath $logfile -Append
-    New-Itemproperty -Path "HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -Name "bEnhancedSecurityInBrowser" -Value "00000000" -PropertyType DWORD -Force | Out-Null
+    if ($printercheck1 -contains "True") {
+        Write-Output "Printer: Encompass Document Converter is installed" | out-file -FilePath $logfile -Append
+    } else {
+        Write-Output "Printer: Encompass Document Converter is not installed, installing now..." | out-file -FilePath $logfile -Append
+        Add-Printer  -Name "Encompass Document Converter" -DriverName "Encompass Document Converter Driver" -PortName "EDCPort:"
     }
-    Write-Output "Checking RegKey: bEnhancedSecurityStandalone..." | Out-File -FilePath $logfile -Append
-if ($regcheck3_5 -contains "True" -and $regcheck3_6 -contains "True")
-    {
-    Write-Output "RegKey: bEnhancedSecurityStandalone is correctly installed, no action taken" | Out-File -FilePath $logfile -Append
+    if ($printercheck2 -contains "True") {
+        Write-Output "Printer: Encompass eFolder is installed" | out-file -FilePath $logfile -Append
+    } else {
+        Write-Output "Printer: Encompass eFolder is not installed, installing now..." | out-file -FilePath $logfile -Append
+        Add-Printer  -Name "Encompass eFolder" -DriverName "Encompass eFolder 2.0" -PortName "eFolderPort"
     }
-else
-    {
-    Write-Output "Key not found, writing RegKey: bEnhancedSecurityStandalone" | Out-File -FilePath $logfile -Append
-    New-Itemproperty -Path "HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown" -Name "bEnhancedSecurityStandalone" -Value "00000000" -PropertyType DWORD -Force | Out-Null
-    }
-if ($regcheck4 -contains "True")
-    {
-    Write-Output "Bad key found in HKCU\...\AppCompatFlags\Layers, removing key" | Out-File -FilePath $logfile -Append
-    Remove-Itemproperty "HKU:\$sid\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" -Name "C:\SmartClientCache\Apps\Ellie Mae\Encompass\Encompass.exe"
-    }
-if ($regcheck4_2 -contains "True")
-    {
-    Write-Output "Bad key found in HKLM\...\AppCompatFlags\Layers, removing key" | Out-File -FilePath $logfile -Append
-    Remove-Itemproperty "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" -Name "C:\SmartClientCache\Apps\Ellie Mae\Encompass\Encompass.exe"
-    }
-if ($printercheck1 -contains "True")
-    {
-    Write-Output "Printer: Encompass Document Converter is installed" | out-file -FilePath $logfile -Append
-    }
-else
-    {
-    Write-Output "Printer: Encompass Document Converter is not installed, installing now..." | out-file -FilePath $logfile -Append
-    Add-Printer  -Name "Encompass Document Converter" -DriverName "Encompass Document Converter Driver" -PortName "EDCPort:"
-    }
-if ($printercheck2 -contains "True")
-    {
-    Write-Output "Printer: Encompass eFolder is installed" | out-file -FilePath $logfile -Append
-    }
-else
-    {
-    Write-Output "Printer: Encompass eFolder is not installed, installing now..." | out-file -FilePath $logfile -Append
-    Add-Printer  -Name "Encompass eFolder" -DriverName "Encompass eFolder 2.0" -PortName "eFolderPort"
-    }
-if ($printercheck3 -contains "True")
-    {
-    Write-Output "Printer: Encompass is installed" | out-file -FilePath $logfile -Append
-    }
-else 
-    {
-    Write-Output "Printer: Encompass is not installed, installing now..." | out-file -FilePath $logfile -Append
-    Add-Printer  -Name "Encompass" -DriverName "Amyuni Document Converter 2.51" -PortName "PDF"
+    if ($printercheck3 -contains "True") {
+        Write-Output "Printer: Encompass is installed" | out-file -FilePath $logfile -Append
+    } else {
+        Write-Output "Printer: Encompass is not installed, installing now..." | out-file -FilePath $logfile -Append
+        Add-Printer  -Name "Encompass" -DriverName "Amyuni Document Converter 2.51" -PortName "PDF"
     }
 
 #remove previously mapped PSDrive
