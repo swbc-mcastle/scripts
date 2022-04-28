@@ -38,7 +38,7 @@ $Group = Get-ADGroup "Domain Users" -properties @("primaryGroupToken")
 $Desc = Get-ADUser $User -Properties Description | Select -ExpandProperty Description
 
 #Variable: $RemGroups - Retrieves list of groups to be removed. Uses the -notmatch comparison operator to filter out groups that should remain
-$RemGroups = (Get-ADUser "$User" -prop MemberOf).MemberOf -notmatch 'M365_License_Exchange' -notmatch 'M365_License_OneDrive' -notmatch 'Okta VDI' -notmatch 'Okta VPN' -notmatch 'O365_Intune_*' -notmatch 'Okta_8x8'
+$RemGroups = (Get-ADUser "$User" -prop MemberOf).MemberOf -notmatch 'M365_License_Exchange' -notmatch 'M365_License_OneDrive' -notmatch 'Okta VDI' -notmatch 'Okta VPN'
 
 #This line sets the clipboard to the SAM user name of the terminated account (for convenience purposes)
 Set-Clipboard $User
